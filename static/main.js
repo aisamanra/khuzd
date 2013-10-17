@@ -1,38 +1,13 @@
-function toDwarfMonth(t){
-    return(t.replace('January','Granite')
-	   .replace('February','Slate')
-	   .replace('March','Felsite')
-	   .replace('April','Hematite')
-	   .replace('May','Malachite')
-	   .replace('June','Galena')
-	   .replace('July','Limestone')
-	   .replace('August','Sandstone')
-	   .replace('September','Timber')
-	   .replace('October','Moonstone')
-	   .replace('November','Opal')
-	   .replace('December','Obsidian'));
-};
-
-function fromDwarfMonth(t) {
-    return(t.replace('Granite','January')
-	   .replace('Slate','February')
-	   .replace('Felsite','March')
-	   .replace('Hematite','April')
-	   .replace('Malachite','May')
-	   .replace('Galena','June')
-	   .replace('Limestone','July')
-	   .replace('Sandstone','August')
-	   .replace('Timber','September')
-	   .replace('Moonstone','October')
-	   .replace('Opal','November')
-	   .replace('Obsidian','December'));
-};
-
-function dateReplace(f){
-    var spans=document.getElementsByTagName('span');
+functionateReplace(toDwarvish){
+    var spans=document.getElementsByClassName('bilingual');
     for(var i in spans) {
-	if(spans[i].className&&spans[i].className.search('date')!== -1)
-	    spans[i].innerHTML=f(spans[i].innerHTML);
+	var elem = spans[i];
+	if (! (elem && elem.dataset)) continue;
+	
+	if (toDwarvish)
+	    elem.innerHTML = elem.dataset['dwarvish'];
+	else
+	    elem.innerHTML = elem.dataset['english'];
     }
 };
 
@@ -41,7 +16,7 @@ window.onload = function() {
 	is_dwarf=!is_dwarf;
 	if (window.localStorage)
 	    window.localStorage.setItem('dwarvish',is_dwarf);
-	dateReplace(is_dwarf?toDwarfMonth:fromDwarfMonth);
+	dateReplace(is_dwarf);
     };
     function scroll() {
 	var posY=( document.documentElement.scrollTop
@@ -51,13 +26,11 @@ window.onload = function() {
     };
     var bg=document.getElementById('bg');
     var is_dwarf=(window.localStorage&&window.localStorage.getItem('dwarvish')=='true');
-    var spans=document.getElementsByTagName('span');
-    for (var i in spans) {
-	if (spans[i].className&&spans[i].className.search('date')!==-1)	{ 
-	    spans[i].onclick=toggle
-	}
+    var elems=document.getElementsByClassName('bilingual');
+    for (var i in elems) {
+	elems[i].onclick=toggle;
     }
-    dateReplace(is_dwarf?toDwarfMonth:fromDwarfMonth);
+    dateReplace(is_dwarf);
     scroll();
     
     window.onscroll=scroll;

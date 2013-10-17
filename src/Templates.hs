@@ -8,7 +8,8 @@ import           Data.Maybe (isJust)
 import           Data.Monoid ((<>))
 import           Data.Text (Text)
 import qualified Data.Text as T
-import           Data.Time (UTCTime)
+import           Data.Time (UTCTime(..))
+import           Data.Time.Calendar (toGregorian)
 import           Data.Time.Format (formatTime)
 import           Prelude (String, ($), (++), (==), return, Bool(..), Maybe(..), show)
 import qualified Prelude as P
@@ -154,8 +155,30 @@ postBody user (post@Post { .. }) = div ! class_ "post" $ do
           editLink _ = return ()
           editURL = toValue (urlForPost post <> "/edit")
 
-formatDate :: UTCTime -> String
-formatDate = formatTime defaultTimeLocale "%e %B, %Y"
+toMonth :: P.Int -> Html
+toMonth n = span ! class_ "bilingual"
+                 ! dataAttribute "english" ename
+                 ! dataAttribute "dwarvish" dname
+                 $ return ()
+  where ename = [ "January", "February", "March"
+                , "April",   "May",      "June"
+                , "July",    "August",   "September"
+                , "October", "November", "December"
+                ] P.!! n
+        dname = [ "Granite",   "Slate",     "Felsite"
+                , "Hematite",  "Malachite", "Galena"
+                , "Limestone", "Sandstone", "Timber"
+                , "Moonstone", "Opal",      "Obsidian"
+                ] P.!! n
+
+formatDate :: UTCTime -> Html
+formatDate t = do
+  toMarkup (show day)
+  " "
+  toMonth month
+  ", "
+  toMarkup (show year)
+    where (year, month, day) = toGregorian (utctDay t)
 
 listBody :: [PostRef] -> Html
 listBody ps = div ! class_ "list" $ P.mapM_ go ps
