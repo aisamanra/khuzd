@@ -1,4 +1,4 @@
-functionateReplace(toDwarvish){
+function dateReplace(toDwarvish){
     var spans=document.getElementsByClassName('bilingual');
     for(var i in spans) {
 	var elem = spans[i];
