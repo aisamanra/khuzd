@@ -11,7 +11,7 @@ import qualified Data.Text as T
 import           Data.Time (UTCTime(..))
 import           Data.Time.Calendar (toGregorian)
 import           Data.Time.Format (formatTime)
-import           Prelude (String, ($), (++), (==), return, Bool(..), Maybe(..), show)
+import           Prelude (String, ($), (++), (-), (==), return, Bool(..), Maybe(..), show)
 import qualified Prelude as P
 import           System.Locale (defaultTimeLocale)
 import           Text.Blaze.Html5
@@ -51,7 +51,11 @@ page isLoggedIn pgName pgContents = docTypeHtml $ do
     title (toHtml ("Baruk Khazâd: " `T.append` pgName))
   body ! id "bg" $ do
     userText
-    div ! class_ "title" $ h1 ("Baruk Khazâd! Khazâd ai-Mênu!")
+    div ! class_ "title" $ h1 $
+      span ! class_ "bilingual" 
+           ! dataAttribute "english" "Axes of the Dwarves! The Dwarves are Upon You!"
+           ! dataAttribute "dwarvish" "Baruk Khazâd! Khazâd ai-Mênu!"
+           $ ("Baruk Khazâd! Khazâd ai-Mênu!")
     div ! class_ "nav" $ titlebar isLoggedIn
     div ! class_ "main" $ pgContents
   where userText = case isLoggedIn of
@@ -175,7 +179,7 @@ formatDate :: UTCTime -> Html
 formatDate t = do
   toMarkup (show day)
   " "
-  toMonth month
+  toMonth (month - 1)
   ", "
   toMarkup (show year)
     where (year, month, day) = toGregorian (utctDay t)
