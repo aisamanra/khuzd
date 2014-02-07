@@ -53,21 +53,22 @@ app = makeSnaplet "khuzd" "Strike the earth!" Nothing $ do
   return $ App s d a
 
 routes :: [(ByteString, AppHandler ())]
-routes = [ ("/",                        method POST doAddPost <|>
-                                          (doIndex  >>= doPage))
-         , ("/auth",                    doLoginForm >>= doPage)
-         , ("/archive",                 doArchive   >>= doPage)
-         , ("/create",                  doCreate    >>= doPage)
-         , ("/:year/:month/:slug",      doPost      >>= doPage)
-         , ("/:year/:month/:slug/edit", editPost    >>= doPage)
-         , ("/login",                   with auth handleLoginSubmit)
-         , ("/logout",                  with auth handleLogout)
-         , ("/newest",                  doNewestRedirect)
-         , ("/oldest",                  doOldestRedirect)
-         , ("/change",                  method POST doPasswdChange <|>
-                                          (doPasswdForm >>= doPage))
-         , ("/static",                  serveDirectory "static")
-         , ("/newuser",                 method POST doNewUser)
+routes = [ ("/",                          method POST doAddPost <|>
+                                            (doIndex  >>= doPage))
+         , ("/auth",                      doLoginForm >>= doPage)
+         , ("/archive",                   doArchive   >>= doPage)
+         , ("/create",                    doCreate    >>= doPage)
+         , ("/:year/:month/:slug",        doPost      >>= doPage)
+         , ("/:year/:month/:slug/edit",   editPost    >>= doPage)
+         , ("/:year/:month/:slug/delete", deletePost  >>= doPage)
+         , ("/login",                     with auth handleLoginSubmit)
+         , ("/logout",                    with auth handleLogout)
+         , ("/newest",                    doNewestRedirect)
+         , ("/oldest",                    doOldestRedirect)
+         , ("/change",                    method POST doPasswdChange <|>
+                                            (doPasswdForm >>= doPage))
+         , ("/static",                    serveDirectory "static")
+         , ("/newuser",                   method POST doNewUser)
          ]
 
 doPasswdForm :: AppHandler Page
@@ -201,6 +202,15 @@ editPost = do
   case (post, user) of
     (Just pg, Just u)
       | u == postAuthor pg -> return (Edit u (toRaw pg))
+    _                      -> finishWith basicError
+
+deletePost :: AppHandler Page
+deletePost = do
+  post <- getPost
+  user <- fmap usrLogin `fmap` with auth currentUser
+  case (post, user) of
+    (Just pg, Just u)
+      | u == postAuthor pg -> return (Delete u (toRaw pg))
     _                      -> finishWith basicError
 
 doPage :: Page -> AppHandler ()
